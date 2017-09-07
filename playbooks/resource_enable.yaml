@@ -1,0 +1,23 @@
+
+- hosts: netscaler
+  gather_facts: no
+  vars:
+    resource: server
+    resource_action: enable
+    request_payload:
+      server:
+        name: test-server-1
+
+  tasks:
+    - name: Add resource
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/{{ resource }}?action={{ resource_action }}"
+        method: POST
+        status_code: 200
+        return_content: yes
+        headers:
+          X-NITRO-USER: "{{ nitro_user }}"
+          X-NITRO-PASS: "{{ nitro_pass }}"
+        body_format: json
+        body: "{{ request_payload }}"
