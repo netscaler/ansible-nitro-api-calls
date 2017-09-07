@@ -1,0 +1,19 @@
+- hosts: netscaler
+  gather_facts: no
+  tasks:
+    - name: Save config
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/nsconfig?action=save"
+        method: POST
+        status_code: 200
+        headers:
+          X-NITRO-USER: "{{ nitro_user }}"
+          X-NITRO-PASS: "{{ nitro_pass }}"
+        body_format: json
+        body:
+          nsconfig: {}
+
+
+
+

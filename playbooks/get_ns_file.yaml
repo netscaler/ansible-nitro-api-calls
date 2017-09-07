@@ -1,0 +1,25 @@
+- hosts: netscaler
+  gather_facts: no
+  vars:
+    filename: "ns.conf"
+    filelocation: "/nsconfig"
+    localfile: "/var/tmp/ns.conf"
+  tasks:
+
+    - name: Get file
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/systemfile?args=filename:{{ filename }},filelocation:{{ filelocation | replace('/','%2F') }}"
+        method: GET
+        status_code: 200
+        return_content: yes
+        headers:
+          X-NITRO-USER: "{{ nitro_user }}"
+          X-NITRO-PASS: "{{ nitro_pass }}"
+      register: result
+
+    - name: Save to localfile
+      delegate_to: localhost
+      copy:
+        content: "{{ result.json.systemfile[0].filecontent | b64decode }}"
+        dest: "{{ localfile }}"

@@ -1,0 +1,25 @@
+
+- hosts: netscaler
+  gather_facts: no
+  connection: local
+
+  vars:
+    warm_reboot: yes
+
+  tasks:
+    - name: Reboot Netscaler
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/reboot"
+        method: POST
+        status_code: 201
+        headers:
+          X-NITRO-USER: "{{ nitro_user }}"
+          X-NITRO-PASS: "{{ nitro_pass }}"
+        body_format: json
+        body:
+          reboot:
+            warm: "{{ warm_reboot }}"
+
+
+
+

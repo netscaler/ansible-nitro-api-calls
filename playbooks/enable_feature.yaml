@@ -1,0 +1,39 @@
+- hosts: netscaler
+  gather_facts: no
+  connection: local
+  vars:
+    contents: "{{ lookup('file', '/home/georgen/repos/uri/README.md') }}"
+    filename: ns.conf
+    filelocation_encoded: "%2Fnsconfig"
+    filelocation: /nsconfig
+  tasks:
+
+    - name: Delete old ns.conf
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/systemfile?args=filename:{{ filename }},filelocation:{{ filelocation_encoded }}"
+        method: DELETE
+        status_code: 200
+        headers:
+          X-NITRO-USER: "{{ nitro_user }}"
+          X-NITRO-PASS: "{{ nitro_pass }}"
+        return_content: yes
+        body_format: json
+        body:
+          systemfile:
+            filename: ns.conf
+            filelocation: /var/tmp
+
+    - name: Copy new ns.conf
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/systemfile"
+        method: POST
+        status_code: 201
+        headers:
+          X-NITRO-USER: "{{ nitro_user }}"
+          X-NITRO-PASS: "{{ nitro_pass }}"
+        body_format: json
+        body:
+          systemfile:
+            filename: "{{ filename }}"
+            filecontent: "{{ lookup('file', 'vpx_ns.conf') | b64encode }}"
+            filelocation: "{{ filelocation }}"
