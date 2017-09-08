@@ -1,0 +1,257 @@
+#NS12.0 Build 41.16
+# Last modified by `save config`, Thu Sep  7 12:22:22 2017
+set ns config -IPAddress 10.78.60.202 -netmask 255.255.255.0
+enable ns feature LB CS GSLB REWRITE
+enable ns mode FR L3 Edge USNIP PMTUD
+set system parameter -doppler DISABLED
+set system user nsroot 266df729a5a3684fc51c88624940384aaa718a857bbf1f6cc3119ce156ee8af86ce3a6bb35212036b97ea26b3e45683b869424286ed59aa320df263159681de5067bf1e92 -encrypted -hashmethod SHA512
+set rsskeytype -rsstype ASYMMETRIC
+set lacp -sysPriority 32768 -mac 52:dd:f2:41:ac:31
+set ns hostName ncs
+set interface 1/1 -throughput 0 -bandwidthHigh 0 -bandwidthNormal 0 -intftype "Xen Virtual" -ifnum 1/1
+set interface 1/2 -throughput 0 -bandwidthHigh 0 -bandwidthNormal 0 -intftype "Xen Virtual" -ifnum 1/2
+set interface LO/1 -haMonitor OFF -haHeartbeat OFF -throughput 0 -bandwidthHigh 0 -bandwidthNormal 0 -intftype Loopback -ifnum LO/1
+add ns ip6 fe80::50dd:f2ff:fe41:ac31/64 -scope link-local -type NSIP -vlan 1 -vServer DISABLED -mgmtAccess ENABLED -dynamicRouting ENABLED
+add ns ip 10.78.60.203 255.255.255.0 -type VIP -mgmtAccess ENABLED
+add ns ip 192.168.10.2 255.255.255.0 -vServer DISABLED -mgmtAccess ENABLED
+set nd6RAvariables -vlan 1
+set snmp alarm APPFW-BUFFER-OVERFLOW -timeout 1
+set snmp alarm APPFW-COOKIE -timeout 1
+set snmp alarm APPFW-CSRF-TAG -timeout 1
+set snmp alarm APPFW-DENY-URL -timeout 1
+set snmp alarm APPFW-FIELD-CONSISTENCY -timeout 1
+set snmp alarm APPFW-FIELD-FORMAT -timeout 1
+set snmp alarm APPFW-POLICY-HIT -timeout 1
+set snmp alarm APPFW-REFERER-HEADER -timeout 1
+set snmp alarm APPFW-SAFE-COMMERCE -timeout 1
+set snmp alarm APPFW-SAFE-OBJECT -timeout 1
+set snmp alarm APPFW-SESSION-LIMIT -timeout 1
+set snmp alarm APPFW-SQL -timeout 1
+set snmp alarm APPFW-START-URL -timeout 1
+set snmp alarm APPFW-VIOLATIONS-TYPE -timeout 1
+set snmp alarm APPFW-XML-ATTACHMENT -timeout 1
+set snmp alarm APPFW-XML-DOS -timeout 1
+set snmp alarm APPFW-XML-SCHEMA-COMPILE -timeout 1
+set snmp alarm APPFW-XML-SOAP-FAULT -timeout 1
+set snmp alarm APPFW-XML-SQL -timeout 1
+set snmp alarm APPFW-XML-VALIDATION -timeout 1
+set snmp alarm APPFW-XML-WSI -timeout 1
+set snmp alarm APPFW-XML-XSS -timeout 1
+set snmp alarm APPFW-XSS -timeout 1
+set snmp alarm CLUSTER-BACKPLANE-HB-MISSING -time 86400 -timeout 86400
+set snmp alarm CLUSTER-NODE-HEALTH -time 86400 -timeout 86400
+set snmp alarm CLUSTER-NODE-QUORUM -time 86400 -timeout 86400
+set snmp alarm CLUSTER-VERSION-MISMATCH -time 86400 -timeout 86400
+set snmp alarm COMPACT-FLASH-ERRORS -time 86400 -timeout 86400
+set snmp alarm CONFIG-CHANGE -timeout 86400
+set snmp alarm CONFIG-SAVE -timeout 86400
+set snmp alarm HA-BAD-SECONDARY-STATE -time 86400 -timeout 86400
+set snmp alarm HA-NO-HEARTBEATS -time 86400 -timeout 86400
+set snmp alarm HA-SYNC-FAILURE -time 86400 -timeout 86400
+set snmp alarm HA-VERSION-MISMATCH -time 86400 -timeout 86400
+set snmp alarm HARD-DISK-DRIVE-ERRORS -time 86400 -timeout 86400
+set snmp alarm HA-STATE-CHANGE -timeout 86400
+set snmp alarm HA-STICKY-PRIMARY -timeout 86400
+set snmp alarm PORT-ALLOC-FAILED -time 3600 -timeout 3600
+set snmp alarm SYNFLOOD -timeout 1
+bind policy patset ns_vpn_client_useragents AGEE -index 1 -charset ASCII
+bind policy patset ns_vpn_client_useragents CitrixReceiver -index 2 -charset ASCII
+bind policy patset ns_vpn_client_useragents AGMacClient -index 3 -charset ASCII
+bind policy patset ns_vpn_client_useragents "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:18.0) Gecko/20100101 Firefox/18.0" -index 4 -charset ASCII
+bind policy patset ns_vpn_client_useragents "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:22.0) Gecko/20100101 Firefox/22.0" -index 5 -charset ASCII
+bind policy patset ns_aaa_activesync_useragents Apple-iPhone -index 1 -charset ASCII
+bind policy patset ns_aaa_activesync_useragents Apple-iPad -index 2 -charset ASCII
+bind policy patset ns_aaa_activesync_useragents SAMSUNG-GT -index 3 -charset ASCII
+bind policy patset ns_aaa_activesync_useragents "SAMSUNG GT" -index 4 -charset ASCII
+bind policy patset ns_aaa_activesync_useragents AirWatch -index 5 -charset ASCII
+bind policy patset ns_aaa_activesync_useragents "TouchDown(MSRPC)" -index 6 -charset ASCII
+add ns tcpProfile nsulfd_default_profile -WS ENABLED -SACK ENABLED -WSVal 8 -maxBurst 10 -initialCwnd 6 -oooQSize 100 -pktPerRetx 3 -minRTO 200 -sendBuffsize 2097152 -rstMaxAck ENABLED -spoofSynDrop DISABLED -tcpmode ENDPOINT
+set ssl profile ns_default_ssl_profile_backend -sessionTicketLifeTime 0
+set cmp parameter -policyType ADVANCED
+
+# Start of Jinja inserted servers
+{% for server in configuration.servers %}
+add server {{ server.name }} {{ server.ipaddress }}
+{% endfor %}
+# End of Jinja inserted servers
+
+# Start of Jinja inserted services
+{% for service in configuration.services %}
+add service {{ service.name }} {{ service.ipaddress }} {{ service.type }} {{ service.port }} -gslb NONE -maxClient 0 -maxReq 0 -cip DISABLED -usip NO -useproxyport YES -sp OFF -cltTimeout 180 -svrTimeout 360 -CKA NO -TCPB NO -CMP NO
+{% endfor %}
+# End of Jinja inserted services
+
+add ssl certKey ns-server-certificate -cert ns-server.cert -key ns-server.key
+add ssl certKey certificate_http -cert server.crt -key server.key
+set lb parameter -sessionsThreshold 150000
+
+# Start of Jinja inserted lb vservers
+{% for vserver in configuration.lbvservers %}
+add lb vserver {{ vserver.name }} {{ vserver.type }} {{ vserver.ipaddress }} {{ vserver.port }} -persistenceType NONE -cltTimeout 180
+{% endfor %}
+# End of Jinja inserted lb vservers
+
+set cache parameter -via "NS-CACHE-10.0: 202"
+add gslb vserver gslb-vserver-http HTTP -backupLBMethod ROUNDROBIN -tolerance 0
+set gslb vserver gslb-vserver-http -backupLBMethod ROUNDROBIN -tolerance 0
+set aaa parameter -maxAAAUsers 4294967295
+add gslb site gslb-site-http 192.168.1.4 -publicIP 192.168.1.4
+add gslb site gslb-site-http-remote 192.168.2.4 -publicIP 192.168.2.4
+set ns rpcNode 10.78.60.202 -password c0b791d9aead3ba6bdd7a75a9267c02575a42a6f481cf1590b4b5898ac3457932501d026ab7f2775dee81c025f71a2a5 -encrypted -encryptmethod ENCMTHD_3 -srcIP 10.78.60.202
+set ns rpcNode 192.168.1.4 -password 5f4953629050b87026acbe256bc7bdd7cea4dd44edeb369f8f07cd9eb132a53e57522325f850688a2d4f7811ef827620 -encrypted -encryptmethod ENCMTHD_3 -srcIP *
+set ns rpcNode 192.168.2.4 -password a3a8a909b53f62fd2183b16d1384098ddb7acea4c37548ea4b6d2fedd14b1e9d8791360ee826cff4845e101f9ebf1727 -encrypted -encryptmethod ENCMTHD_3 -srcIP *
+add rewrite policylabel test_action http_req
+bind cmp global ns_adv_nocmp_xml_ie -priority 8700 -gotoPriorityExpression END -type RES_DEFAULT
+bind cmp global ns_adv_nocmp_mozilla_47 -priority 8800 -gotoPriorityExpression END -type RES_DEFAULT
+bind cmp global ns_adv_cmp_mscss -priority 8900 -gotoPriorityExpression END -type RES_DEFAULT
+bind cmp global ns_adv_cmp_msapp -priority 9000 -gotoPriorityExpression END -type RES_DEFAULT
+bind cmp global ns_adv_cmp_content_type -priority 10000 -gotoPriorityExpression END -type RES_DEFAULT
+add cache contentGroup DEFAULT
+set cache contentGroup NSFEO -maxResSize 1994752
+add cache contentGroup BASEFILE -relExpiry 86000 -weakNegRelExpiry 600 -maxResSize 256 -memLimit 2
+add cache contentGroup DELTAJS -relExpiry 86000 -weakNegRelExpiry 600 -insertAge NO -maxResSize 256 -memLimit 1 -pinned YES
+add cache contentGroup ctx_cg_poc -relExpiry 86000 -weakNegRelExpiry 600 -insertAge NO -maxResSize 500 -memLimit 256 -pinned YES
+add cache policy _nonGetReq -rule "!HTTP.REQ.METHOD.eq(GET)" -action NOCACHE
+add cache policy _advancedConditionalReq -rule "HTTP.REQ.HEADER(\"If-Match\").EXISTS || HTTP.REQ.HEADER(\"If-Unmodified-Since\").EXISTS" -action NOCACHE
+add cache policy _personalizedReq -rule "HTTP.REQ.HEADER(\"Cookie\").EXISTS || HTTP.REQ.HEADER(\"Authorization\").EXISTS || HTTP.REQ.HEADER(\"Proxy-Authorization\").EXISTS || HTTP.REQ.IS_NTLM_OR_NEGOTIATE" -action MAY_NOCACHE
+add cache policy _uncacheableStatusRes -rule "! ((HTTP.RES.STATUS.EQ(200)) || (HTTP.RES.STATUS.EQ(304)) || (HTTP.RES.STATUS.BETWEEN(400,499)) || (HTTP.RES.STATUS.BETWEEN(300, 302)) || (HTTP.RES.STATUS.EQ(307))|| (HTTP.RES.STATUS.EQ(203)))" -action NOCACHE
+add cache policy _uncacheableCacheControlRes -rule "((HTTP.RES.CACHE_CONTROL.IS_PRIVATE) || (HTTP.RES.CACHE_CONTROL.IS_NO_CACHE) || (HTTP.RES.CACHE_CONTROL.IS_NO_STORE) || (HTTP.RES.CACHE_CONTROL.IS_INVALID))" -action NOCACHE
+add cache policy _cacheableCacheControlRes -rule "((HTTP.RES.CACHE_CONTROL.IS_PUBLIC) || (HTTP.RES.CACHE_CONTROL.IS_MAX_AGE) || (HTTP.RES.CACHE_CONTROL.IS_MUST_REVALIDATE) || (HTTP.RES.CACHE_CONTROL.IS_PROXY_REVALIDATE) || (HTTP.RES.CACHE_CONTROL.IS_S_MAXAGE))" -action CACHE -storeInGroup DEFAULT
+add cache policy _uncacheableVaryRes -rule "((HTTP.RES.HEADER(\"Vary\").EXISTS) && ((HTTP.RES.HEADER(\"Vary\").INSTANCE(1).LENGTH > 0) || (!HTTP.RES.HEADER(\"Vary\").STRIP_END_WS.SET_TEXT_MODE(IGNORECASE).eq(\"Accept-Encoding\"))))" -action NOCACHE
+add cache policy _uncacheablePragmaRes -rule "HTTP.RES.HEADER(\"Pragma\").EXISTS" -action NOCACHE
+add cache policy _cacheableExpiryRes -rule "HTTP.RES.HEADER(\"Expires\").EXISTS" -action CACHE -storeInGroup DEFAULT
+add cache policy _imageRes -rule "HTTP.RES.HEADER(\"Content-Type\").SET_TEXT_MODE(IGNORECASE).STARTSWITH(\"image/\")" -action CACHE -storeInGroup DEFAULT
+add cache policy _personalizedRes -rule "HTTP.RES.HEADER(\"Set-Cookie\").EXISTS || HTTP.RES.HEADER(\"Set-Cookie2\").EXISTS" -action NOCACHE
+add cache policy ctx_images -rule "HTTP.REQ.URL.SET_TEXT_MODE(IGNORECASE).CONTAINS_INDEX(\"ctx_file_extensions\").BETWEEN(101,150)" -action CACHE -storeInGroup ctx_cg_poc
+add cache policy ctx_web_css -rule "HTTP.REQ.URL.ENDSWITH(\".css\")" -action CACHE -storeInGroup ctx_cg_poc
+add cache policy ctx_doc_pdf -rule "HTTP.REQ.URL.ENDSWITH(\".pdf\")" -action CACHE -storeInGroup ctx_cg_poc
+add cache policy ctx_web_JavaScript -rule "HTTP.REQ.URL.ENDSWITH(\".js\")" -action CACHE -storeInGroup ctx_cg_poc
+add cache policy ctx_web_JavaScript-Res -rule "HTTP.RES.HEADER(\"Content-Type\").CONTAINS(\"application/x-javascript\")" -action CACHE -storeInGroup ctx_cg_poc
+add cache policy ctx_NOCACHE_Cleanup -rule TRUE -action NOCACHE
+add cache policylabel _reqBuiltinDefaults -evaluates REQ
+add cache policylabel _resBuiltinDefaults -evaluates RES
+bind cache policylabel _reqBuiltinDefaults -policyName _nonGetReq -priority 100 -gotoPriorityExpression END
+bind cache policylabel _reqBuiltinDefaults -policyName _advancedConditionalReq -priority 200 -gotoPriorityExpression END
+bind cache policylabel _reqBuiltinDefaults -policyName _personalizedReq -priority 300 -gotoPriorityExpression END
+bind cache policylabel _resBuiltinDefaults -policyName _uncacheableStatusRes -priority 100 -gotoPriorityExpression END
+bind cache policylabel _resBuiltinDefaults -policyName _uncacheableVaryRes -priority 200 -gotoPriorityExpression END
+bind cache policylabel _resBuiltinDefaults -policyName _uncacheableCacheControlRes -priority 300 -gotoPriorityExpression END
+bind cache policylabel _resBuiltinDefaults -policyName _cacheableCacheControlRes -priority 400 -gotoPriorityExpression END
+bind cache policylabel _resBuiltinDefaults -policyName _uncacheablePragmaRes -priority 500 -gotoPriorityExpression END
+bind cache policylabel _resBuiltinDefaults -policyName _cacheableExpiryRes -priority 600 -gotoPriorityExpression END
+bind cache policylabel _resBuiltinDefaults -policyName _imageRes -priority 700 -gotoPriorityExpression END
+bind cache policylabel _resBuiltinDefaults -policyName _personalizedRes -priority 800 -gotoPriorityExpression END
+bind cache global NOPOLICY -priority 185883 -gotoPriorityExpression USE_INVOCATION_RESULT -type REQ_DEFAULT -invoke policylabel _reqBuiltinDefaults
+bind cache global NOPOLICY -priority 185883 -gotoPriorityExpression USE_INVOCATION_RESULT -type RES_DEFAULT -invoke policylabel _resBuiltinDefaults
+set ns encryptionParams -method AES256 -keyValue a76c01e11d8ad66395415da50d8f4a28f82d657c842e4cc48876bf76d59f88980a93bd02a55a28795bb7fdc02579a1cfa89542df7f3e3ee45b458973df0cbab752414810952d99d13441f252a95ae4b5 -encrypted -encryptmethod ENCMTHD_3
+add transform profile test_profile
+add transform action test_action test_profile 100
+set transform action test_action -priority 100 -reqUrlFrom "([^/]*)/demo(/.*$)?([?].*)?" -reqUrlInto "(1)(2)"
+add transform policy test_policy "HTTP.REQ.URL.PATH.SET_TEXT_MODE(IGNORECASE).GET(1).EQ(\"demo\")" test_profile
+
+# Start of Jinja inserted lb vservers binds
+{% for bind in configuration.lbvserver_binds %}
+bind lb vserver {{ bind.server }} {{ bind.service }} -weight {{ bind.weight }}
+{% endfor %}
+# End of Jinja inserted lb vservers binds
+
+set ns diameter -identity netscaler.com -realm com
+set subscriber gxInterface -pcrfRealm pcrf.com -holdOnSubscriberAbsence YES -revalidationTimeout 900 -servicePathAVP 262099 -servicePathVendorid 3845
+set ns tcpParam -connFlushIfNoMem NONE
+set ns tcpbufParam -memLimit 388
+add arp -IPAddress 192.168.10.2 -mac 92:1b:10:6b:7c:0d -ifnum 1/2 -vlan 1
+bind gslb vserver gslb-vserver-http -domainName example.com -TTL 400
+set dns parameter -dns64Timeout 1000
+add dns nsRec . a.root-servers.net -TTL 3600000
+add dns nsRec . b.root-servers.net -TTL 3600000
+add dns nsRec . c.root-servers.net -TTL 3600000
+add dns nsRec . d.root-servers.net -TTL 3600000
+add dns nsRec . e.root-servers.net -TTL 3600000
+add dns nsRec . f.root-servers.net -TTL 3600000
+add dns nsRec . g.root-servers.net -TTL 3600000
+add dns nsRec . h.root-servers.net -TTL 3600000
+add dns nsRec . i.root-servers.net -TTL 3600000
+add dns nsRec . j.root-servers.net -TTL 3600000
+add dns nsRec . k.root-servers.net -TTL 3600000
+add dns nsRec . l.root-servers.net -TTL 3600000
+add dns nsRec . m.root-servers.net -TTL 3600000
+add dns addRec k.root-servers.net 193.0.14.129 -TTL 3600000
+add dns addRec l.root-servers.net 199.7.83.42 -TTL 3600000
+add dns addRec a.root-servers.net 198.41.0.4 -TTL 3600000
+add dns addRec b.root-servers.net 192.228.79.201 -TTL 3600000
+add dns addRec c.root-servers.net 192.33.4.12 -TTL 3600000
+add dns addRec d.root-servers.net 199.7.91.13 -TTL 3600000
+add dns addRec m.root-servers.net 202.12.27.33 -TTL 3600000
+add dns addRec i.root-servers.net 192.36.148.17 -TTL 3600000
+add dns addRec j.root-servers.net 192.58.128.30 -TTL 3600000
+add dns addRec g.root-servers.net 192.112.36.4 -TTL 3600000
+add dns addRec h.root-servers.net 198.97.190.53 -TTL 3600000
+add dns addRec e.root-servers.net 192.203.230.10 -TTL 3600000
+add dns addRec f.root-servers.net 192.5.5.241 -TTL 3600000
+set lb monitor ldns-dns LDNS-DNS -query . -queryType Address
+set lb monitor stasecure CITRIX-STA-SERVICE -interval 2 MIN
+set lb monitor sta CITRIX-STA-SERVICE -interval 2 MIN
+add route 0.0.0.0 0.0.0.0 10.78.60.1
+set ssl service nshttps-192.168.10.2-443 -eRSA ENABLED -sessReuse DISABLED
+set ssl service nsrpcs-192.168.10.2-3008 -eRSA ENABLED -sessReuse DISABLED
+set ssl service nsrnatsip-127.0.0.1-5061 -eRSA ENABLED -sessReuse DISABLED
+set ssl service nskrpcs-127.0.0.1-3009 -eRSA ENABLED -sessReuse DISABLED
+set ssl service nshttps-::1l-443 -eRSA ENABLED -sessReuse DISABLED
+set ssl service nsrpcs-::1l-3008 -eRSA ENABLED -sessReuse DISABLED
+set ssl service nshttps-127.0.0.1-443 -eRSA ENABLED -sessReuse DISABLED
+set ssl service nsrpcs-127.0.0.1-3008 -eRSA ENABLED -sessReuse DISABLED
+set vpn parameter -forceCleanup none -clientConfiguration all
+bind audit syslogGlobal -policyName SETSYSLOGPARAMS_ADV_POL -priority 2000000000
+bind audit nslogGlobal -policyName SETNSLOGPARAMS_ADV_POL -priority 2000000000
+bind tm global -policyName SETTMSESSPARAMS_ADV_POL -priority 65534 -gotoPriorityExpression NEXT
+bind ssl service nshttps-192.168.10.2-443 -certkeyName ns-server-certificate
+bind ssl service nsrpcs-192.168.10.2-3008 -certkeyName ns-server-certificate
+bind ssl service nsrnatsip-127.0.0.1-5061 -certkeyName ns-server-certificate
+bind ssl service nskrpcs-127.0.0.1-3009 -certkeyName ns-server-certificate
+bind ssl service nshttps-::1l-443 -certkeyName ns-server-certificate
+bind ssl service nsrpcs-::1l-3008 -certkeyName ns-server-certificate
+bind ssl service nshttps-127.0.0.1-443 -certkeyName ns-server-certificate
+bind ssl service nsrpcs-127.0.0.1-3008 -certkeyName ns-server-certificate
+bind ssl service nshttps-192.168.10.2-443 -eccCurveName P_256
+bind ssl service nshttps-192.168.10.2-443 -eccCurveName P_384
+bind ssl service nshttps-192.168.10.2-443 -eccCurveName P_224
+bind ssl service nshttps-192.168.10.2-443 -eccCurveName P_521
+bind ssl service nsrpcs-192.168.10.2-3008 -eccCurveName P_256
+bind ssl service nsrpcs-192.168.10.2-3008 -eccCurveName P_384
+bind ssl service nsrpcs-192.168.10.2-3008 -eccCurveName P_224
+bind ssl service nsrpcs-192.168.10.2-3008 -eccCurveName P_521
+bind ssl service nsrnatsip-127.0.0.1-5061 -eccCurveName P_256
+bind ssl service nsrnatsip-127.0.0.1-5061 -eccCurveName P_384
+bind ssl service nsrnatsip-127.0.0.1-5061 -eccCurveName P_224
+bind ssl service nsrnatsip-127.0.0.1-5061 -eccCurveName P_521
+bind ssl service nskrpcs-127.0.0.1-3009 -eccCurveName P_256
+bind ssl service nskrpcs-127.0.0.1-3009 -eccCurveName P_384
+bind ssl service nskrpcs-127.0.0.1-3009 -eccCurveName P_224
+bind ssl service nskrpcs-127.0.0.1-3009 -eccCurveName P_521
+bind ssl service nshttps-::1l-443 -eccCurveName P_256
+bind ssl service nshttps-::1l-443 -eccCurveName P_384
+bind ssl service nshttps-::1l-443 -eccCurveName P_224
+bind ssl service nshttps-::1l-443 -eccCurveName P_521
+bind ssl service nsrpcs-::1l-3008 -eccCurveName P_256
+bind ssl service nsrpcs-::1l-3008 -eccCurveName P_384
+bind ssl service nsrpcs-::1l-3008 -eccCurveName P_224
+bind ssl service nsrpcs-::1l-3008 -eccCurveName P_521
+bind ssl service nshttps-127.0.0.1-443 -eccCurveName P_256
+bind ssl service nshttps-127.0.0.1-443 -eccCurveName P_384
+bind ssl service nshttps-127.0.0.1-443 -eccCurveName P_224
+bind ssl service nshttps-127.0.0.1-443 -eccCurveName P_521
+bind ssl service nsrpcs-127.0.0.1-3008 -eccCurveName P_256
+bind ssl service nsrpcs-127.0.0.1-3008 -eccCurveName P_384
+bind ssl service nsrpcs-127.0.0.1-3008 -eccCurveName P_224
+bind ssl service nsrpcs-127.0.0.1-3008 -eccCurveName P_521
+add appfw JSONContentType "^application/json$" -isRegex REGEX
+add appfw XMLContentType ".*/xml" -isRegex REGEX
+add appfw XMLContentType ".*/.*\\+xml" -isRegex REGEX
+add appfw XMLContentType ".*/xml-.*" -isRegex REGEX
+set ip6TunnelParam -srcIP ::
+set ptp -state ENABLE
+set ns param -timezone "GMT+02:00-EET-Europe/Athens"
+set ns vpxparam -cpuyield DEFAULT
+set qos parameters -debuglevel 0
+set urlfiltering parameter -TimeOfDayToUpdateDB 03:00 -ProxyUsername " " -ProxyPassword 3a1572c6590eb5c6401dda5276b4dcd26c6f2051c3b952d987144a95fab3a9c6 -encrypted -encryptmethod ENCMTHD_3
+set videooptimization parameter -RandomSamplingPercentage 0.00e+00

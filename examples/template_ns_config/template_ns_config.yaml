@@ -1,0 +1,90 @@
+
+- hosts: netscaler
+  gather_facts: no
+  vars:
+    filename: "ns.conf"
+    filelocation: "/nsconfig"
+    localfile: "/var/tmp/ns.conf"
+
+    warm_reboot: yes
+
+    configuration:
+      servers:
+        - name: 192.168.1.1
+          ipaddress: 192.168.1.1
+        - name: 192.168.1.2
+          ipaddress: 192.168.1.2
+
+      services:
+        - name: service-test-1
+          ipaddress: 192.168.1.1
+          port: 80
+          type: HTTP
+
+        - name: service-test-2
+          ipaddress: 192.168.1.2
+          port: 80
+          type: HTTP
+
+      lbvservers:
+        - name: server-test
+          ipaddress: 10.78.60.203
+          port: 80
+          type: HTTP
+
+      lbvserver_binds:
+        - server: server-test
+          service: service-test-1
+          weight: 50
+        - server: server-test
+          service: service-test-2
+          weight: 50
+
+  tasks:
+    - name: Produce ns.conf from template
+      delegate_to: localhost
+      template:
+        src: ns.conf.template
+        dest: "{{ localfile }}"
+
+    - name: Delete old ns.conf
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/systemfile?args=filename:{{ filename }},filelocation:{{ filelocation | replace('/','%2F') }}"
+        method: DELETE
+        status_code: 200
+        return_content: yes
+        headers:
+          X-NITRO-USER: "{{ nitro_user }}"
+          X-NITRO-PASS: "{{ nitro_pass }}"
+
+    - name: Upload new ns.conf
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/systemfile"
+        method: POST
+        status_code: 201
+        return_content: yes
+        headers:
+          X-NITRO-USER: "{{ nitro_user }}"
+          X-NITRO-PASS: "{{ nitro_pass }}"
+        body_format: json
+        body:
+          systemfile:
+            filename: "{{ filename }}"
+            filecontent: "{{ lookup('file', localfile) | b64encode }}"
+            filelocation: "{{ filelocation }}"
+
+    - name: Reboot Netscaler
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/reboot"
+        method: POST
+        status_code: 201
+        headers:
+          X-NITRO-USER: "{{ nitro_user }}"
+          X-NITRO-PASS: "{{ nitro_pass }}"
+        body_format: json
+        body:
+          reboot:
+            warm: "{{ warm_reboot }}"

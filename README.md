@@ -29,7 +29,7 @@ Following are the details of each playbook.
 
 Deletes a file on Netscaler.
 
-Variables used:
+Variables:
 
 * filelocation: path of the file on Netscaler
 * filename: name of the file on Netscaler
@@ -38,7 +38,7 @@ Variables used:
 
 Retrieve a file from Netscaler.
 
-Variables used:
+Variables:
 
 * filelocation: path of the file on Netscaler.
 * filename: name of the file on Netscaler.
@@ -48,7 +48,7 @@ Variables used:
 
 Upload a file to Netscaler.
 
-Variables used:
+Variables:
 
 * filelocation: path of the file on Netscaler.
 * filename: name of the file on Netscaler.
