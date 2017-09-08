@@ -5,7 +5,7 @@
     resource: server/test-server-1
 
   tasks:
-    - name: Add resource
+    - name: Get resource
       delegate_to: localhost
       uri:
         url: "http://{{ nsip }}/nitro/v1/config/{{ resource }}"
