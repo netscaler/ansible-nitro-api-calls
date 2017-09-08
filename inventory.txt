@@ -1,0 +1,4 @@
+
+[netscaler]
+
+netscaler_cpx120 nsip=172.18.0.200 nitro_user=nsroot nitro_pass=nsroot validate_certs=no
