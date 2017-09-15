@@ -187,7 +187,7 @@ of these HTTP request headers.
 * `_MPS_API_PROXY_MANAGED_INSTANCE_ID`: ID of the managed instance.
 
 In the playbooks we use  `_MPS_API_PROXY_MANAGED_INSTANCE_IP` but any of the
-other headers are also applicable.
+other headers are also suitable.
 
   *Note* the `nsip`, `nitro_user` and `nitro_pass` variables must be set
   to match the MAS ip address and NITRO API credentials. Once we get the login token
