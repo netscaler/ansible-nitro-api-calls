@@ -1,0 +1,28 @@
+
+- hosts: netscaler
+  gather_facts: no
+  vars:
+    timeout: 3600
+    login_object:
+      login:
+        username: "{{ nitro_user }}"
+        password: "{{ nitro_pass }}"
+
+  tasks:
+    - name: MAS Login
+      register: login_result
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/login"
+        method: POST
+        return_content: yes
+        status_code: 200
+        body_format: json
+        body: >
+          object=
+          {{ login_object | to_json }}
+
+    - name: Show session id for illustration purposes
+
+      debug:
+        msg: "The session id retrieved is {{ login_result.json.login[0].sessionid }}"

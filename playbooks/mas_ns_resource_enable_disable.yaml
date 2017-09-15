@@ -1,0 +1,42 @@
+
+- hosts: netscaler
+  gather_facts: no
+  vars:
+    resource: server
+    resource_action: enable
+    request_payload:
+      server:
+        name: test-server-1
+
+    login_object:
+      login:
+        username: "{{ nitro_user }}"
+        password: "{{ nitro_pass }}"
+    managed_instance_ip: 10.221.48.207
+
+  tasks:
+    - name: MAS Login
+      register: login_result
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/login"
+        method: POST
+        return_content: yes
+        status_code: 200
+        body_format: json
+        body: >
+          object=
+          {{ login_object | to_json }}
+
+    - name: Disable resource
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/{{ resource }}?action={{ resource_action }}"
+        method: POST
+        status_code: 200
+        return_content: yes
+        headers:
+          Cookie: "NITRO_AUTH_TOKEN={{ login_result.json.login[0].sessionid }}"
+          _MPS_API_PROXY_MANAGED_INSTANCE_IP: "{{ managed_instance_ip }}"
+        body_format: json
+        body: "{{ request_payload }}"

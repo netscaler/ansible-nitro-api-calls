@@ -1,13 +1,13 @@
 
 - hosts: netscaler
   gather_facts: no
-  connection: local
 
   vars:
     warm_reboot: yes
 
   tasks:
     - name: Reboot Netscaler
+      delegate_to: localhost
       uri:
         url: "http://{{ nsip }}/nitro/v1/config/reboot"
         method: POST
@@ -19,7 +19,3 @@
         body:
           reboot:
             warm: "{{ warm_reboot }}"
-
-
-
-

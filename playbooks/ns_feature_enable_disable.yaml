@@ -2,7 +2,7 @@
   gather_facts: no
   vars:
     feature_action: enable
-    request_payload: 
+    request_payload:
       nsfeature:
         feature:
           - LB
