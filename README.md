@@ -206,6 +206,10 @@ There exist the follwoing playbooks:
 * mas\_ns\_resource\_update.yaml
 * mas\_ns\_save\_running\_config.yaml
 * mas\_ns\_feature\_enable\_disable.yaml
+* mas\_ns\_file\_delete.yaml
+* mas\_ns\_file\_get.yaml
+* mas\_ns\_file\_put.yaml
+* mas\_ns\_reboot.yaml
 
 The variables used and operations results are the same as
 the similarly named NetScaler playbooks under `playbooks/ns/`.
