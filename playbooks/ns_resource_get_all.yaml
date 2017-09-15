@@ -2,14 +2,14 @@
 - hosts: netscaler
   gather_facts: no
   vars:
-    resource: server/test-server-1
+    resource: server
 
   tasks:
-    - name: Add resource
+    - name: Get all
       delegate_to: localhost
       uri:
         url: "http://{{ nsip }}/nitro/v1/config/{{ resource }}"
-        method: DELETE
+        method: GET
         status_code: 200
         return_content: yes
         headers:
