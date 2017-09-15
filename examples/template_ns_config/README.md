@@ -12,4 +12,4 @@ The general workflow of the playbook is the following.
 4. Reboot NetScaler to apply the changes to ns.conf.
 
 A more detailed overview can be found here
-http://netscaler-ansible.readthedocs.io/en/latest/generic\_modules/template\_ns\_conf.html
+http://netscaler-ansible.readthedocs.io/en/latest/generic_modules/template_ns_conf.html
