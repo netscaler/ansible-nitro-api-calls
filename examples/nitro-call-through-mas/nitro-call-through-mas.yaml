@@ -1,0 +1,86 @@
+
+- hosts: netscaler
+  gather_facts: no
+  vars:
+    resource: server
+    request_payload:
+      server:
+        name: test-server-1
+        ipaddress: 192.168.1.6
+    managed_instance_ip: 10.221.48.207
+
+    mas_login_object:
+      login:
+        username: "{{ nitro_user }}"
+        password: "{{ nitro_pass }}"
+
+  tasks:
+    - name: MAS Login
+      register: login_result
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/login"
+        method: POST
+        return_content: yes
+        status_code: 200
+        body_format: json
+        body: >
+          object=
+          {{ mas_login_object | to_json }}
+
+    - name: "Get resource through MAS for managed instace ip {{ managed_instance_ip }}"
+      delegate_to: localhost
+      ignore_errors: true
+      register: get_result
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/{{ resource }}/{{ request_payload.server.name }}"
+        method: GET
+        status_code: 200
+        return_content: yes
+        headers:
+          Cookie: "NITRO_AUTH_TOKEN={{ login_result.json.login[0].sessionid }}"
+          _MPS_API_PROXY_MANAGED_INSTANCE_IP: "{{ managed_instance_ip }}"
+
+    - name: Check success or expected failure
+      assert:
+        that: get_result|succeeded or ( get_result|failed and get_result.json.errorcode == 258 )
+
+    - name: Add custom server
+      when: get_result|failed
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/{{ resource }}"
+        method: POST
+        status_code: 201
+        return_content: yes
+        headers:
+          Cookie: "NITRO_AUTH_TOKEN={{ login_result.json.login[0].sessionid }}"
+          _MPS_API_PROXY_MANAGED_INSTANCE_IP: "{{ managed_instance_ip }}"
+        body_format: json
+        body: "{{ request_payload }}"
+
+
+    - name: Update resource if existing
+      when: get_result|succeeded
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/{{ resource }}"
+        method: PUT
+        status_code: 200
+        return_content: yes
+        headers:
+          Cookie: "NITRO_AUTH_TOKEN={{ login_result.json.login[0].sessionid }}"
+          _MPS_API_PROXY_MANAGED_INSTANCE_IP: "{{ managed_instance_ip }}"
+        body_format: json
+        body: "{{ request_payload }}"
+
+    - name: Delete resource
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/{{ resource }}/{{ request_payload.server.name }}"
+        method: DELETE
+        status_code: 200
+        return_content: yes
+        headers:
+          Cookie: "NITRO_AUTH_TOKEN={{ login_result.json.login[0].sessionid }}"
+          _MPS_API_PROXY_MANAGED_INSTANCE_IP: "{{ managed_instance_ip }}"
