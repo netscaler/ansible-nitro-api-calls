@@ -91,7 +91,7 @@ Variables:
 
 Refer to NITRO reference documentation for variable values explanation.
 
-#### ns\_resource\_disable.yaml
+#### ns\_resource\_enable\_disable.yaml
 
 Disable a configuration resource on Netscaler.
 
@@ -99,17 +99,7 @@ Variables:
 
 * resource: path of the resource.
 * request\_payload: request JSON content.
-
-Refer to NITRO reference documentation for variable values explanation.
-
-#### ns\_resource\_enable.yaml
-
-Enable a configuration resource on Netscaler.
-
-Variables:
-
-* resource: path of the resource.
-* request\_payload: request JSON content.
+* resource\_action: 'enable' / 'disable' the resource.
 
 Refer to NITRO reference documentation for variable values explanation.
 
