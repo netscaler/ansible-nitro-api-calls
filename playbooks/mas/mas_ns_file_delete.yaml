@@ -1,0 +1,38 @@
+- hosts: netscaler
+
+  gather_facts: no
+
+  vars:
+    login_object:
+      login:
+        username: "{{ nitro_user }}"
+        password: "{{ nitro_pass }}"
+
+    managed_instance_ip: 10.221.48.207
+
+    filename: "ns.conf"
+    filelocation: "/var/tmp"
+
+  tasks:
+    - name: MAS Login
+      register: login_result
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/login"
+        method: POST
+        return_content: yes
+        status_code: 200
+        body_format: json
+        body: >
+          object=
+          {{ login_object | to_json }}
+    - name: Delete old ns.conf
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/systemfile?args=filename:{{ filename }},filelocation:{{ filelocation | replace('/','%2F') }}"
+        method: DELETE
+        status_code: 200
+        return_content: yes
+        headers:
+          Cookie: "NITRO_AUTH_TOKEN={{ login_result.json.login[0].sessionid }}"
+          _MPS_API_PROXY_MANAGED_INSTANCE_IP: "{{ managed_instance_ip }}"

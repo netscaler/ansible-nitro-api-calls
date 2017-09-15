@@ -1,0 +1,41 @@
+
+- hosts: netscaler
+  gather_facts: no
+
+  vars:
+    warm_reboot: yes
+
+    login_object:
+      login:
+        username: "{{ nitro_user }}"
+        password: "{{ nitro_pass }}"
+
+    managed_instance_ip: 10.221.48.207
+
+  tasks:
+    - name: MAS Login
+      register: login_result
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/login"
+        method: POST
+        return_content: yes
+        status_code: 200
+        body_format: json
+        body: >
+          object=
+          {{ login_object | to_json }}
+
+    - name: Reboot Netscaler
+      delegate_to: localhost
+      uri:
+        url: "http://{{ nsip }}/nitro/v1/config/reboot"
+        method: POST
+        status_code: 201
+        headers:
+          Cookie: "NITRO_AUTH_TOKEN={{ login_result.json.login[0].sessionid }}"
+          _MPS_API_PROXY_MANAGED_INSTANCE_IP: "{{ managed_instance_ip }}"
+        body_format: json
+        body:
+          reboot:
+            warm: "{{ warm_reboot }}"
